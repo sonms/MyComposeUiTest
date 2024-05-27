@@ -3,7 +3,10 @@ package com.example.mycomposeuitest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +26,9 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,6 +43,9 @@ import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,20 +55,26 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.mycomposeuitest.model.culture.CulturalEventDataViewModel
+import com.example.mycomposeuitest.navigation.account.AccountScreen
 import com.example.mycomposeuitest.navigation.cultural_event.CultureEventScreen
 import com.example.mycomposeuitest.navigation.home.HomeScreen
 import com.example.mycomposeuitest.navigation.safety.SafetyScreen
 import com.example.mycomposeuitest.ui.theme.MyComposeUiTestTheme
+import com.example.mycomposeuitest.ui.theme.Purple80
+import com.example.mycomposeuitest.ui.theme.PurpleGrey80
 
 const val HOME = "HOME"
 const val SAFETY = "SAFETY"
 const val CULTURE = "CULTURE"
+const val ACCOUNT = "ACCOUNT"
 sealed class BottomNavItem(
     val title: String, val icon: Int, val screenRoute: String
 ) {
     data object Home : BottomNavItem("홈", R.drawable.home, HOME)
     data object Culture : BottomNavItem("문화", R.drawable.culture, CULTURE)
     data object Safety : BottomNavItem("안전", R.drawable.safety, SAFETY)
+    data object Account : BottomNavItem("My", R.drawable.account, ACCOUNT)
 }
 
 class MainActivity : ComponentActivity() {
@@ -69,28 +85,43 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     //Greeting("Android")
+                    val culturalEventDataViewModel: CulturalEventDataViewModel by viewModels()
+                    MainScreenView(culturalEventDataViewModel = culturalEventDataViewModel)
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreenView() {
+fun MainScreenView(culturalEventDataViewModel: CulturalEventDataViewModel) {
     val navController = rememberNavController()
     Scaffold(
+        topBar = {
+            TopAppBar(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                title = { Text(text = "JPM", fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold) },
+                colors = TopAppBarDefaults.topAppBarColors (
+                    containerColor = PurpleGrey80
+                )
+            )
+
+        },
         bottomBar = { BottomNavigationMenu(
-            navController = navController)
+            navController = navController,
+            culturalEventDataViewModel = culturalEventDataViewModel)
         }
     ) {
         Box(Modifier.padding(it)){//화면 contentview(framelayout)
-            NavigationGraph(navController = navController)
+            NavigationGraph(navController = navController, culturalEventDataViewModel)
         }
     }
 }
 
 @Composable
-fun BottomNavigationMenu(navController: NavHostController) {
+fun BottomNavigationMenu(navController: NavHostController, culturalEventDataViewModel: CulturalEventDataViewModel) {
     val items = listOf<BottomNavItem>(
         BottomNavItem.Home,
         BottomNavItem.Culture,
@@ -153,13 +184,13 @@ fun BottomNavigationMenu(navController: NavHostController) {
 }
 
 @Composable
-fun NavigationGraph(navController: NavHostController) {
+fun NavigationGraph(navController: NavHostController, culturalEventDataViewModel: CulturalEventDataViewModel) {
     NavHost(navController = navController, startDestination = BottomNavItem.Home.screenRoute) {
         //탐색 시에 인수를 경로와 함께 전달하려면 "route/{argument}" 패턴에 따라 경로에 인수를 추가
         //route - BottomNavItem.Home.screenRoute
         //argument를 통해 특정 아이템을 클릭했는지 정보를 담을 수있음
         composable(BottomNavItem.Home.screenRoute) {
-            HomeScreen()
+            HomeScreen(culturalEventDataViewModel)
         }
         composable(BottomNavItem.Culture.screenRoute) {
             CultureEventScreen()
@@ -167,16 +198,19 @@ fun NavigationGraph(navController: NavHostController) {
         composable(BottomNavItem.Safety.screenRoute) {
             SafetyScreen()
         }
+        composable(BottomNavItem.Account.screenRoute) {
+            AccountScreen()
+        }
     }
 }
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun preView() {
     MyComposeUiTestTheme {
         MainScreenView()
     }
-}
+}*/
 
 /*@Composable
 fun TextTest() {

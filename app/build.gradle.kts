@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id ("kotlin-kapt")
 }
 
 android {
@@ -61,6 +62,19 @@ dependencies {
     implementation("androidx.navigation:navigation-runtime-ktx:2.7.7")
 
     implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    //retrofit2
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.6.0")
+
+    //lifecycle - 뷰모델 사용시필요
+    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.8.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose-ktx:2.6.2")
+    implementation ("androidx.compose.runtime:runtime-livedata:1.6.7")
+
+
+    //coil
+    implementation("io.coil-kt:coil-compose:2.0.0-rc01")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
