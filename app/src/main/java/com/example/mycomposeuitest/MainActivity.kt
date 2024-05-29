@@ -204,15 +204,15 @@ fun NavigationGraph(navController: NavHostController, culturalEventDataViewModel
     }
 }
 
-/*@Preview(showBackground = true)
+
+
+/*@Composable/*@Preview(showBackground = true)
 @Composable
 fun preView() {
     MyComposeUiTestTheme {
         MainScreenView()
     }
 }*/
-
-/*@Composable
 fun TextTest() {
     Text(
         //foldin:modifier = Modifier.foldIn(animationSpec = tween(1000)) 점차나타나는효과

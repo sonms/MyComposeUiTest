@@ -69,7 +69,7 @@ dependencies {
 
     //lifecycle - 뷰모델 사용시필요
     implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.8.0")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose-ktx:2.6.2")
+    //implementation ("androidx.lifecycle:lifecycle-viewmodel-compose-ktx:2.6.2")
     implementation ("androidx.compose.runtime:runtime-livedata:1.6.7")
 
 
