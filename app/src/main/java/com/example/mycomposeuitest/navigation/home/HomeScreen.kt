@@ -5,11 +5,17 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +34,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,12 +77,18 @@ fun HomeScreen(viewModel: CulturalEventDataViewModel) { //등록한 위치를 �
             verticalArrangement = Arrangement.Top
         ) {
             Column (modifier = Modifier.wrapContentSize()) {
-                Text(text = "지정한 지역 문화/관광 체험")
+                Text(
+                    fontWeight = FontWeight.Bold,
+                    text = "지정한 지역 문화/관광 체험"
+                )
                 initSetCultureRow(list = data!!)
             }
 
             Column (modifier = Modifier.wrapContentSize()) {
-                Text(text = "무작위 안전")
+                Text(
+                    fontWeight = FontWeight.Bold,
+                    text = "안전"
+                )
                 initSetCultureRow(list = data!!)
             }
         }
@@ -92,6 +105,64 @@ fun initSetCultureRow(list: List<CulturalEventResponseData>) {
     LazyRow() {
         items(list) { cultureData ->
             CultureRowItem(cultureData)
+        }
+    }
+}
+@Composable
+fun initSetSafetyRow(list: List<CulturalEventResponseData>) {
+    LazyRow() {
+        items(list) { cultureData ->
+            CultureRowItem(cultureData)
+        }
+    }
+}
+@Composable
+fun initSetRandomCultureColumn(list: List<CulturalEventResponseData>) {
+    LazyColumn() {
+        items(list) { cultureData ->
+            CultureRowItem(cultureData)
+        }
+    }
+}
+
+
+
+@Composable
+fun RandomCultureColItem(data : CulturalEventResponseData) {
+    val painter = rememberAsyncImagePainter(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(data.mainImg)
+            .size(coil.size.Size.ORIGINAL) // Set the target size to load the image at.
+            .build()
+    )
+    Card(
+        modifier = Modifier
+            .wrapContentSize()
+            .padding(8.dp),
+        shape = RoundedCornerShape(15.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Column(
+            modifier = Modifier.wrapContentSize(),
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Image(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .width(200.dp)
+                    .height(200.dp),
+                painter = rememberAsyncImagePainter(painter),
+                contentScale = ContentScale.Crop,
+                contentDescription = "event main image"
+            )
+            Box(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(12.dp),
+                contentAlignment = Alignment.BottomStart
+            ) {
+                Text(data.title, style = TextStyle(color = White, fontSize = 16.sp))
+            }
         }
     }
 }
@@ -116,7 +187,10 @@ fun CultureRowItem(data : CulturalEventResponseData) {
             verticalArrangement = Arrangement.Center,
         ) {
             Image(
-                modifier = Modifier.wrapContentSize().width(200.dp).height(200.dp),
+                modifier = Modifier
+                    .wrapContentSize()
+                    .width(200.dp)
+                    .height(200.dp),
                 painter = rememberAsyncImagePainter(painter),
                 contentScale = ContentScale.Crop,
                 contentDescription = "event main image"
@@ -171,9 +245,18 @@ fun dummyHomeScreen(viewModel: CulturalEventDataViewModel?) { //등록한 위치
                 dummySetCultureRow(list = data)
             }
 
-            Column (modifier = Modifier.wrapContentSize().padding(top = 20.dp)) {
+            Column (modifier = Modifier
+                .wrapContentSize()
+                .padding(top = 20.dp)) {
                 Text(text = "무작위 안전")
                 dummySetCultureRow(list = data)
+            }
+
+            Column (modifier = Modifier
+                .wrapContentSize()
+                .padding(top = 20.dp)) {
+                Text(text = "무작위 안전")
+                dummySetCultureCol(list = data)
             }
         }
     } else {
@@ -191,6 +274,66 @@ fun dummySetCultureRow(list: List<String>) {
         }
     }
 }
+
+@Composable
+fun dummySetCultureCol(list: List<String>) {
+    LazyColumn() {
+        items(list) { cultureData ->
+            dummyRandomCultureColItem(cultureData)
+        }
+    }
+}
+
+@Composable
+fun dummyRandomCultureColItem(data : String) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        shape = RoundedCornerShape(15.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            horizontalArrangement = Arrangement.Start,
+            ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(start = 12.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    modifier = Modifier.align(alignment = Alignment.End),
+                    text = data,
+                    style = TextStyle(color = White, fontSize = 16.sp)
+                )
+                Text(
+                    modifier = Modifier.align(alignment = Alignment.End),
+                    text = "장소",
+                    style = TextStyle(color = White, fontSize = 16.sp)
+                )
+                Text(
+                    modifier = Modifier.align(alignment = Alignment.End),
+                    text = "날짜",
+                    style = TextStyle(color = White, fontSize = 16.sp)
+                )
+            }
+
+            Spacer(modifier = Modifier.fillMaxWidth(0.5f))
+
+            Image(
+                modifier = Modifier
+                    .width(100.dp)
+                    .wrapContentHeight(), // 이미지의 높이 설정,
+                painter = painterResource(R.drawable.mainjelly),//rememberAsyncImagePainter(painter),//painterResource(R.drawable.mainjelly),//painter,//rememberAsyncImagePainter(R.drawable.mainjelly),
+                contentScale = ContentScale.Crop,
+                contentDescription = "event main image"
+            )
+        }
+    }
+}
+
 
 @Composable
 fun dummyCultureRowItem(data : String) {
@@ -213,8 +356,11 @@ fun dummyCultureRowItem(data : String) {
 
         ) {
             Image(
-                modifier = Modifier.wrapContentSize().width(120.dp) // 이미지의 너비 설정
-                    .height(120.dp).padding(8.dp), // 이미지의 높이 설정,
+                modifier = Modifier
+                    .wrapContentSize()
+                    .width(120.dp) // 이미지의 너비 설정
+                    .height(120.dp)
+                    .padding(8.dp), // 이미지의 높이 설정,
                 painter = painterResource(R.drawable.mainjelly),//rememberAsyncImagePainter(painter),//painterResource(R.drawable.mainjelly),//painter,//rememberAsyncImagePainter(R.drawable.mainjelly),
                 contentScale = ContentScale.Crop,
                 contentDescription = "event main image"
