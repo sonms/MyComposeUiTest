@@ -190,7 +190,7 @@ fun NavigationGraph(navController: NavHostController, culturalEventDataViewModel
         //route - BottomNavItem.Home.screenRoute
         //argument를 통해 특정 아이템을 클릭했는지 정보를 담을 수있음
         composable(BottomNavItem.Home.screenRoute) {
-            HomeScreen(culturalEventDataViewModel)
+            HomeScreen(culturalEventDataViewModel, navController)
         }
         composable(BottomNavItem.Culture.screenRoute) {
             CultureEventScreen()

@@ -1,7 +1,9 @@
 package com.example.mycomposeuitest.navigation.home
 
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,29 +31,39 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.example.mycomposeuitest.BottomNavItem
 import com.example.mycomposeuitest.MainScreenView
 import com.example.mycomposeuitest.R
 import com.example.mycomposeuitest.model.culture.ApiService
 import com.example.mycomposeuitest.model.culture.CulturalEventDataViewModel
 import com.example.mycomposeuitest.model.culture.CulturalEventRequestData
 import com.example.mycomposeuitest.model.culture.CulturalEventResponseData
+import com.example.mycomposeuitest.ui.theme.Blue100
+import com.example.mycomposeuitest.ui.theme.Blue200
+import com.example.mycomposeuitest.ui.theme.Blue300
 import com.example.mycomposeuitest.ui.theme.MyComposeUiTestTheme
+import com.example.mycomposeuitest.ui.theme.Purple80
+import com.example.mycomposeuitest.ui.theme.PurpleGrey80
 
 @Composable
-fun HomeScreen(viewModel: CulturalEventDataViewModel) { //등록한 위치를 기준으로 문화 추천 + 랜덤 안전 추천?
+fun HomeScreen(viewModel: CulturalEventDataViewModel, navController: NavController) { //등록한 위치를 기준으로 문화 추천 + 랜덤 안전 추천?
     val data by viewModel.data.observeAsState()
+    val context = LocalContext.current
     //val viewModel: CulturalEventDataViewModel = viewModel()
     val culturalEventRequestData = CulturalEventRequestData(
         key = "",
@@ -64,6 +76,12 @@ fun HomeScreen(viewModel: CulturalEventDataViewModel) { //등록한 위치를 �
         date = null
     )
     viewModel.fetchData(culturalEventRequestData)
+
+    val onClick = {
+        Toast.makeText(context, "클릭", Toast.LENGTH_SHORT).show()
+        navController.navigate(BottomNavItem.Account.screenRoute)
+    }
+
     // 데이터 로드를 시작합니다.
     if (data != null) {
         //Text(text = "ID: ${data!!.id}, Name: ${data!!.name}")
@@ -79,17 +97,45 @@ fun HomeScreen(viewModel: CulturalEventDataViewModel) { //등록한 위치를 �
             Column (modifier = Modifier.wrapContentSize()) {
                 Text(
                     fontWeight = FontWeight.Bold,
-                    text = "지정한 지역 문화/관광 체험"
-                )
+                    text = "지정한 지역 문화/관광 체험")
                 initSetCultureRow(list = data!!)
             }
 
-            Column (modifier = Modifier.wrapContentSize()) {
-                Text(
-                    fontWeight = FontWeight.Bold,
-                    text = "안전"
-                )
+            Column (modifier = Modifier
+                .wrapContentSize()
+                .padding(top = 20.dp)) {
+                Text(fontWeight = FontWeight.Bold, text = "무작위 안전")
                 initSetCultureRow(list = data!!)
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp)
+                    .padding(8.dp)
+                    .fillMaxHeight(0.15f)
+                    .clickable {
+                        onClick()
+                    },
+                shape = RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = PurpleGrey80
+                )
+            ) {
+                Text(
+                    modifier = Modifier.padding(8.dp).fillMaxSize(),
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    text = "더 많은 문화/관광 정보를 원한다면?",
+                )
+            }
+
+            Column (modifier = Modifier
+                .wrapContentSize()
+                .padding(top = 20.dp)) {
+                Text(fontWeight = FontWeight.Bold, text = "마감 임박")
+                initSetRandomCultureColumn(list = data!!)
             }
         }
     } else {
@@ -127,7 +173,7 @@ fun initSetRandomCultureColumn(list: List<CulturalEventResponseData>) {
 
 
 
-@Composable
+@Composable //찐
 fun RandomCultureColItem(data : CulturalEventResponseData) {
     val painter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
@@ -137,32 +183,56 @@ fun RandomCultureColItem(data : CulturalEventResponseData) {
     )
     Card(
         modifier = Modifier
-            .wrapContentSize()
+            .fillMaxWidth()
             .padding(8.dp),
         shape = RoundedCornerShape(15.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Blue100
+        )
     ) {
-        Column(
-            modifier = Modifier.wrapContentSize(),
-            verticalArrangement = Arrangement.Center,
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.Start,
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(start = 12.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    modifier = Modifier.align(alignment = Alignment.End),
+                    fontWeight = FontWeight.Bold,
+                    text = data.title,
+                    style = TextStyle(color = White, fontSize = 16.sp)
+                )
+                Text(
+                    modifier = Modifier.align(alignment = Alignment.End),
+                    fontWeight = FontWeight.Bold,
+                    text = data.place,
+                    style = TextStyle(color = White, fontSize = 16.sp)
+                )
+                Text(
+                    modifier = Modifier.align(alignment = Alignment.End),
+                    fontWeight = FontWeight.Bold,
+                    text = data.date,
+                    style = TextStyle(color = White, fontSize = 16.sp)
+                )
+            }
+
+            Spacer(modifier = Modifier.fillMaxWidth(0.5f))
+
             Image(
                 modifier = Modifier
-                    .wrapContentSize()
-                    .width(200.dp)
-                    .height(200.dp),
-                painter = rememberAsyncImagePainter(painter),
+                    .width(100.dp)
+                    .wrapContentHeight(), // 이미지의 높이 설정,
+                painter = rememberAsyncImagePainter(painter),//rememberAsyncImagePainter(painter),//painterResource(R.drawable.mainjelly),//painter,//rememberAsyncImagePainter(R.drawable.mainjelly),
                 contentScale = ContentScale.Crop,
                 contentDescription = "event main image"
             )
-            Box(
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(12.dp),
-                contentAlignment = Alignment.BottomStart
-            ) {
-                Text(data.title, style = TextStyle(color = White, fontSize = 16.sp))
-            }
         }
     }
 }
@@ -224,7 +294,12 @@ fun dummyHomeScreen(viewModel: CulturalEventDataViewModel?) { //등록한 위치
         date = null
     )
     viewModel.fetchData(culturalEventRequestData)*/
+    val context = LocalContext.current
     val data = arrayListOf<String>("dkdkd", "ddldld", "ASddas", "asdf", "bbbbvbvx", "bmxmxmz")
+
+    val onClick = {
+        Toast.makeText(context, "클릭", Toast.LENGTH_SHORT).show()
+    }
 
     // 데이터 로드를 시작합니다.
     if (data != null) {
@@ -240,7 +315,7 @@ fun dummyHomeScreen(viewModel: CulturalEventDataViewModel?) { //등록한 위치
         ) {
             Column (modifier = Modifier.wrapContentSize()) {
                 Text(
-                    modifier = Modifier.padding(bottom = 10.dp),
+                    fontWeight = FontWeight.Bold,
                     text = "지정한 지역 문화/관광 체험")
                 dummySetCultureRow(list = data)
             }
@@ -248,14 +323,37 @@ fun dummyHomeScreen(viewModel: CulturalEventDataViewModel?) { //등록한 위치
             Column (modifier = Modifier
                 .wrapContentSize()
                 .padding(top = 20.dp)) {
-                Text(text = "무작위 안전")
+                Text(fontWeight = FontWeight.Bold, text = "무작위 안전")
                 dummySetCultureRow(list = data)
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp)
+                    .padding(8.dp)
+                    .fillMaxHeight(0.15f)
+                    .clickable {
+                       onClick()
+                    },
+                shape = RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = PurpleGrey80
+                )
+            ) {
+                Text(
+                    modifier = Modifier.padding(8.dp).fillMaxSize(),
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    text = "더 많은 문화/관광 정보를 원한다면?",
+                )
             }
 
             Column (modifier = Modifier
                 .wrapContentSize()
                 .padding(top = 20.dp)) {
-                Text(text = "무작위 안전")
+                Text(fontWeight = FontWeight.Bold, text = "마감 임박")
                 dummySetCultureCol(list = data)
             }
         }
@@ -291,10 +389,15 @@ fun dummyRandomCultureColItem(data : String) {
             .fillMaxWidth()
             .padding(8.dp),
         shape = RoundedCornerShape(15.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Blue100
+        )
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
             horizontalArrangement = Arrangement.Start,
             ) {
             Column(
@@ -305,16 +408,19 @@ fun dummyRandomCultureColItem(data : String) {
             ) {
                 Text(
                     modifier = Modifier.align(alignment = Alignment.End),
+                    fontWeight = FontWeight.Bold,
                     text = data,
                     style = TextStyle(color = White, fontSize = 16.sp)
                 )
                 Text(
                     modifier = Modifier.align(alignment = Alignment.End),
+                    fontWeight = FontWeight.Bold,
                     text = "장소",
                     style = TextStyle(color = White, fontSize = 16.sp)
                 )
                 Text(
                     modifier = Modifier.align(alignment = Alignment.End),
+                    fontWeight = FontWeight.Bold,
                     text = "날짜",
                     style = TextStyle(color = White, fontSize = 16.sp)
                 )
@@ -348,7 +454,10 @@ fun dummyCultureRowItem(data : String) {
             .wrapContentSize()
             .padding(8.dp),
         shape = RoundedCornerShape(15.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Blue200,
+        )
     ) {
         Column(
             modifier = Modifier.wrapContentSize(),
@@ -358,8 +467,8 @@ fun dummyCultureRowItem(data : String) {
             Image(
                 modifier = Modifier
                     .wrapContentSize()
+                    .wrapContentHeight()
                     .width(120.dp) // 이미지의 너비 설정
-                    .height(120.dp)
                     .padding(8.dp), // 이미지의 높이 설정,
                 painter = painterResource(R.drawable.mainjelly),//rememberAsyncImagePainter(painter),//painterResource(R.drawable.mainjelly),//painter,//rememberAsyncImagePainter(R.drawable.mainjelly),
                 contentScale = ContentScale.Crop,
